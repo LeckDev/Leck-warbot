@@ -13,6 +13,11 @@ class ClashApi {
         return response.data;
     }
 
+     async getWarLog(clanTag) {
+        const response = await this.api.get(`/clans/${clanTag}/riverracelog?limit=1`);
+        return response.data;
+    }
+
     async getMembers(clanTag) {
       const response = await this.api.get(`/clans/${clanTag}/members`)
       return response.data;

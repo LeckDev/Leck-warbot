@@ -28,12 +28,12 @@ async function runDailyTask() {
         const activeParticipants = playersRiverRace.filter(participant =>
             currentMemberTags.has(participant.tag)
         );
-
         
         // 4. On appel la fonction pour envoyer le message discord
         await discordMessage.recapDaily(activeParticipants, dailyClanFame, clanName, discordChannelId, discordToken);
+
     } catch (error) {
-        console.error("❌ Erreur lors de la tâche quotidienne :", error);
+        console.error("Erreur lors de la tâche quotidienne :", error);
     }
 }
 

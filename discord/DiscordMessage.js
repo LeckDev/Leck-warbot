@@ -100,6 +100,68 @@ class DiscordMessage {
 
         await client.login(discordToken);
     }
+
+    async recapWeekly(players, discordChannelId, discordToken) {
+         // --- 1 : Joueurs en danger (< 1800) ---
+  const lowFame = players 
+    .filter(p => p.fame < 1800)
+    .sort((a, b) => b.fame - a.fame); // Tri décroissant 
+
+  const embedLow = new EmbedBuilder()
+    .setTitle('📉 Weekly Clan War Recap (Avertissements)')
+    .setColor('#e74c3c') // Rouge
+    .setDescription('Joueurs sous la barre des **1800 points**')
+    .addFields({
+      name: 'Membres concernés',
+      value: lowFame.length
+        ? lowFame.map(p =>
+          `• **${p.name}** — ${p.fame} points | ${p.decksUsed} decks | ${p.role} | ID : ${p.tag}`
+        ).join('\n')
+        : '🎉 Personne en dessous de 1800 !'
+    });
+
+  // --- 2 : Promotions (>= 2800 & role === 'member') ---
+  const toPromote = players
+    .filter(p => p.fame >= 2800 && p.role === 'member') // Uniquement les 'member'
+    .sort((a, b) => b.fame - a.fame); // Tri décroissant (les plus gros scores en haut)
+
+  const embedHigh = new EmbedBuilder()
+    .setTitle('🆙 Promotions Recommandées')
+    .setColor('#2ecc71') // Vert
+    .setDescription('Membres éligibles pour devenir **Elder** (>= 2800 points)')
+    .addFields({
+      name: 'À promouvoir',
+      value: toPromote.length
+        ? toPromote.map(p =>
+          `• **${p.name}** — ${p.fame} points | ${p.decksUsed} decks | ID : ${p.tag}`
+        ).join('\n')
+        : 'Aucune promotion à faire cette semaine.'
+    })
+    .setTimestamp();
+
+  // --- ENVOI DISCORD ---
+  const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+
+  client.once('ready', async () => {
+    try {
+      const channel = await client.channels.fetch(discordChannelId);
+
+      // Envoi du rapport négatif
+      await channel.send({ embeds: [embedLow] });
+
+      // Envoi du rapport positif
+      await channel.send({ embeds: [embedHigh] });
+
+      console.log('✅ Les 2 rapports Discord ont été envoyés.');
+    } catch (error) {
+      console.error('Erreur lors de l\'envoi Discord:', error);
+    } finally {
+      client.destroy();
+    }
+  });
+
+  await client.login(discordToken);
+    }
 };
 
 module.exports = {DiscordMessage};
