@@ -1,0 +1,22 @@
+name: Daily War Recap
+on:
+  repository_dispatch:
+    types: [daily_recap] # Le signal externe qu'on va envoyer
+  workflow_dispatch: # On garde le bouton manuel au cas où
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm install
+      - name: Run Daily Script
+        run: node .\bin\Daily.js
+        env:
+          DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+          CLAN_TAG: ${{ secrets.CLAN_TAG }}
+          REPORT_CHANNEL_ID: ${{ secrets.REPORT_CHANNEL_ID }}
+          CLASH_API_TOKEN: ${{ secrets.CLASH_API_TOKEN }}
