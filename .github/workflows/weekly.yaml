@@ -13,8 +13,8 @@ jobs:
         with:
           node-version: '20'
       - run: npm install
-      - name: Run Daily Script
-        run: node .\bin\Weekly.js
+      - name: Run Weekly Script
+        run: node bin/Weekly.js
         env:
           DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
           CLAN_TAG: ${{ secrets.CLAN_TAG }}

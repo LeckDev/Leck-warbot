@@ -14,7 +14,7 @@ jobs:
           node-version: '20'
       - run: npm install
       - name: Run Daily Script
-        run: node .\bin\Daily.js
+        run: node bin/Daily.js
         env:
           DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
           CLAN_TAG: ${{ secrets.CLAN_TAG }}
