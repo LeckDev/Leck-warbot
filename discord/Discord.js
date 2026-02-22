@@ -34,7 +34,7 @@ class Discord {
       const messages = await latestThread.messages.fetch();
 
       // 4. Parsing avec Regex (Multi-ligne et insensible à la casse)
-       const absents = messages
+      const absents = messages
         .map((m) => {
           const content = m.content;
 
@@ -52,11 +52,11 @@ class Discord {
           }
           return null;
         })
-        .filter(Boolean); // On enlève les messages qui ne respectent pas le template      
+        .filter(Boolean); // On enlève les messages qui ne respectent pas le template
 
       return {
-        threadId: latestThread.id, 
-        absents: absents 
+        threadId: latestThread.id,
+        absents: absents,
       };
     } catch (error) {
       console.error("❌ Erreur lors de la récupération des absents :", error);
@@ -80,17 +80,22 @@ class Discord {
       const forumChannel = await client.channels.fetch(absentsChannelId);
 
       // Génération d'un nom de fil unique avec la date
-      const date = new Date();
+      const startDate = new Date();
       const options = { day: "numeric", month: "long" };
-      const dateString = date.toLocaleDateString("fr-FR", options);
-      const threadName = `Absences - Semaine du ${dateString}`;
+      const startString = startDate.toLocaleDateString("fr-FR", options);
 
+      const endDate = new Date();
+      endDate.setDate(startDate.getDate() + 7); // On ajoute 7 jours
+      const endString = endDate.toLocaleDateString("fr-FR", options);
+
+      // 3. Assemblage du titre
+      const threadName = `Absences - Semaine du ${startString} au ${endString}`;
       // Création du fil dans le forum
       const thread = await forumChannel.threads.create({
         name: threadName,
         autoArchiveDuration: ThreadAutoArchiveDuration.OneWeek,
         message: {
-          content: `🚩 **NOUVELLE SEMAINE DE GDC**\n\nMerci de déclarer vos absences ici en respectant le modèle ci-dessous.\n\n**Modèle à copier :**\n\nTag: #\nNom: \nRaison: `,
+          content: `🚩 **NOUVELLE SEMAINE DE GDC**\n\nMerci de déclarer vos absences ici en respectant le modèle ci-dessous.\n\n**Modèle à copier :**\n\nTag: \nNom: \nRaison: `,
         },
         reason: "Ouverture automatique pour la nouvelle semaine de guerre",
       });
