@@ -1,53 +1,85 @@
-require('dotenv').config();
+require("dotenv").config();
 
-const { ClashApi } = require('../api/ClashApi')
-const { DiscordMessage } = require('../discord/DiscordMessage')
+const { ClashApi } = require("../api/ClashApi");
+const { DiscordMessage } = require("../discord/DiscordMessage");
+const { Discord } = require("../discord/Discord");
+
 
 async function runWeeklyTask() {
-    try {
-        const clashApi = new ClashApi(process.env.CLASH_API_TOKEN);
-        const discordMessage = new DiscordMessage();
-        const clanTag = process.env.CLAN_TAG;
-        const discordChannelId = process.env.REPORT_CHANNEL_ID;
-        const discordToken = process.env.DISCORD_TOKEN;
+  try {
+    const clashApi = new ClashApi(process.env.CLASH_API_TOKEN);
+    const discordMessage = new DiscordMessage();
+    const discord = new Discord();
+    const clanTag = process.env.CLAN_TAG;
+    const reportChannelId = process.env.REPORT_CHANNEL_ID;
+    const absentsChannelId = process.env.ABSENTS_CHANNEL_ID;
+    const discordToken = process.env.DISCORD_TOKEN;
 
-        // 1. Récupération des données brutes
-        const warLogData = await clashApi.getWarLog(clanTag);
-        const membersData = await clashApi.getMembers(clanTag);
+    // 1. Récupération des données brutes
+    const warLogData = await clashApi.getWarLog(clanTag);
+    const membersData = await clashApi.getMembers(clanTag);
+    const absentsData = await discord.getAbsentsMessages(
+      discordToken,
+      absentsChannelId,
+    );
+    
+    const absentsMessages = absentsData.absents; // Le tableau des joueurs
 
-        // On récupère la dernière guerre (le premier et seul élément du tableau items car limit=1)
-        const lastWar = warLogData.items[0];
+    const threadIdToArchive = absentsData.threadId;
 
-        // On formate le tag pour qu'il commence par un '#' pour la comparaison
-        const formattedTag = clanTag.replace('%23', '#')
 
-        // On cherche notre clan dans le tableau standings
-        const myClanStanding = lastWar.standings.find(
-            standing => standing.clan.tag === formattedTag
-        );
+    // On récupère la dernière guerre (le premier et seul élément du tableau items car limit=1)
+    const lastWar = warLogData.items[0];
 
-        const playersWarLog = myClanStanding.clan.participants;
+    // On formate le tag pour qu'il commence par un '#' pour la comparaison
+    const formattedTag = clanTag.replace("%23", "#");
 
-        // 3. Filtrer pour ne garder que les membres actuels ET ajouter leur rôle
-        const playersInClan = membersData.items;
+    // On cherche notre clan dans le tableau standings
+    const myClanStanding = lastWar.standings.find(
+      (standing) => standing.clan.tag === formattedTag,
+    );
 
-        // Création du dictionnaire : { "#TAG1" => "coLeader", "#TAG2" => "member" ... }
-        const currentMembersMap = new Map(playersInClan.map(member => [member.tag, member.role]));
+    const playersWarLog = myClanStanding.clan.participants;
 
-        // On filtre et on ajoute le rôle dans le même mouvement
-        const activeParticipants = playersWarLog
-            .filter(participant => currentMembersMap.has(participant.tag))
-            .map(participant => ({
-                ...participant, // On garde fame, decksUsed, boatAttacks, etc.
-                role: currentMembersMap.get(participant.tag) // On ajoute la nouvelle propriété 'role'
-            }));
-            
-        await discordMessage.recapWeekly(activeParticipants, discordChannelId, discordToken)
+    // 3. Filtrer pour ne garder que les membres actuels ET ajouter leur rôle
+    const playersInClan = membersData.items;
 
-    } catch (error) {
-        console.error("Erreur lors de la tâche hebdomadaire :", error);
+    // Création du dictionnaire : { "#TAG1" => "coLeader", "#TAG2" => "member" ... }
+    const currentMembersMap = new Map(
+      playersInClan.map((member) => [member.tag, member.role]),
+    );
 
+    // On filtre et on ajoute le rôle dans le même mouvement
+    const activeParticipants = playersWarLog
+      .filter((participant) => currentMembersMap.has(participant.tag))
+      .map((participant) => ({
+        ...participant, // On garde fame, decksUsed, boatAttacks, etc.
+        role: currentMembersMap.get(participant.tag), // On ajoute la nouvelle propriété 'role'
+      }));
+
+    await discordMessage.recapWeekly(
+      activeParticipants,
+      reportChannelId,
+      discordToken,
+    );
+
+    await discordMessage.recapAbsents(
+    absentsMessages,
+    reportChannelId,
+    discordToken,
+);
+
+    // On vérifie qu'on a bien un ID avant d'archiver
+    if (threadIdToArchive) {
+      await discord.archiveThread(discordToken, threadIdToArchive);
     }
+
+    // Créé le nouveau thread discord
+    await discord.createWeeklyAbsenceThread(discordToken, absentsChannelId);
+
+  } catch (error) {
+    console.error("Erreur lors de la tâche hebdomadaire :", error);
+  }
 }
 
 runWeeklyTask();
