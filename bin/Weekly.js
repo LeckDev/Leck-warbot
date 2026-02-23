@@ -3,25 +3,25 @@ require("dotenv").config();
 const { ClashApi } = require("../api/ClashApi");
 const { DiscordMessage } = require("../discord/DiscordMessage");
 const { Discord } = require("../discord/Discord");
-
+const { DiscordConnection } = require('../discord/DiscordConnection');
 
 async function runWeeklyTask() {
   try {
+    //On créé le client discord
+    const discordToken = process.env.DISCORD_TOKEN;
+    client = await DiscordConnection.createClient(discordToken);
+
     const clashApi = new ClashApi(process.env.CLASH_API_TOKEN);
-    const discordMessage = new DiscordMessage();
-    const discord = new Discord();
+    const discordMessage = new DiscordMessage(client);
+    const discord = new Discord(client);
     const clanTag = process.env.CLAN_TAG;
     const reportChannelId = process.env.REPORT_CHANNEL_ID;
     const absentsChannelId = process.env.ABSENTS_CHANNEL_ID;
-    const discordToken = process.env.DISCORD_TOKEN;
 
     // 1. Récupération des données brutes
     const warLogData = await clashApi.getWarLog(clanTag);
     const membersData = await clashApi.getMembers(clanTag);
-    const absentsData = await discord.getAbsentsMessages(
-      discordToken,
-      absentsChannelId,
-    );
+    const absentsData = await discord.getAbsentsMessages(absentsChannelId);
     
     const absentsMessages = absentsData.absents; // Le tableau des joueurs
 
@@ -60,25 +60,26 @@ async function runWeeklyTask() {
     await discordMessage.recapWeekly(
       activeParticipants,
       reportChannelId,
-      discordToken,
     );
 
     await discordMessage.recapAbsents(
     absentsMessages,
     reportChannelId,
-    discordToken,
 );
 
     // On vérifie qu'on a bien un ID avant d'archiver
     if (threadIdToArchive) {
-      await discord.archiveThread(discordToken, threadIdToArchive);
+      await discord.archiveThread(threadIdToArchive);
     }
 
     // Créé le nouveau thread discord
-    await discord.createWeeklyAbsenceThread(discordToken, absentsChannelId);
+    await discord.createWeeklyAbsenceThread(absentsChannelId);
 
   } catch (error) {
     console.error("Erreur lors de la tâche hebdomadaire :", error);
+  }
+  finally{
+    DiscordConnection.destroyClient(client);
   }
 }
 

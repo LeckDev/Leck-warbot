@@ -1,20 +1,13 @@
-const { Client, GatewayIntentBits, EmbedBuilder } = require("discord.js");
-
+const { ThreadAutoArchiveDuration } = require("discord.js");
 class Discord {
-  async getAbsentsMessages(token, absentsChannelId) {
-    const { Client, GatewayIntentBits } = require("discord.js");
-    const client = new Client({
-      intents: [
-        GatewayIntentBits.Guilds,
-        GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.MessageContent,
-      ],
-    });
 
-    await client.login(token);
+  constructor(client) {
+    this.client = client;
+  }
 
+  async getAbsentsMessages(absentsChannelId) {
     try {
-      const forumChannel = await client.channels.fetch(absentsChannelId);
+      const forumChannel = await this.client.channels.fetch(absentsChannelId);
 
       // 1. Récupérer les fils actifs (threads)
       const fetchedThreads = await forumChannel.threads.fetchActive();
@@ -61,23 +54,12 @@ class Discord {
     } catch (error) {
       console.error("❌ Erreur lors de la récupération des absents :", error);
       return [];
-    } finally {
-      // Très important pour ne pas laisser de processus fantômes sur GitHub Actions
-      client.destroy();
     }
   }
 
-  async createWeeklyAbsenceThread(token, absentsChannelId) {
-    const {
-      Client,
-      GatewayIntentBits,
-      ThreadAutoArchiveDuration,
-    } = require("discord.js");
-    const client = new Client({ intents: [GatewayIntentBits.Guilds] });
-    await client.login(token);
-
+  async createWeeklyAbsenceThread(absentsChannelId) {
     try {
-      const forumChannel = await client.channels.fetch(absentsChannelId);
+      const forumChannel = await this.client.channels.fetch(absentsChannelId);
 
       // Génération d'un nom de fil unique avec la date
       const startDate = new Date();
@@ -102,25 +84,23 @@ class Discord {
 
       console.log(`✅ Nouveau fil créé : ${thread.name}`);
       return thread;
-    } finally {
-      client.destroy();
+    }
+    catch(error){
+      console.log(`Erreur lors de la récupération des messages des absent : ${error}`)
     }
   }
 
-  async archiveThread(token, threadId) {
-    const { Client, GatewayIntentBits } = require("discord.js");
-    const client = new Client({ intents: [GatewayIntentBits.Guilds] });
-    await client.login(token);
-
+  async archiveThread(threadId) {
     try {
-      const thread = await client.channels.fetch(threadId);
+      const thread = await this.client.channels.fetch(threadId);
       if (thread.isThread()) {
         await thread.setLocked(true); // Personne ne peut plus écrire
         await thread.setArchived(true); // Le fil est masqué/archivé
         console.log(`🔒 Fil ${thread.name} archivé et verrouillé.`);
       }
-    } finally {
-      client.destroy();
+    }
+    catch(error) {
+      console.log(`Erreur lors de l'archivage du thread : ${error}`)
     }
   }
 }
