@@ -28,7 +28,6 @@ async function runDailyTask() {
 
         const playersInClan = membersData.items;
         const playersRiverRace = riverRaceData.clan.participants;
-        const dailyClanFame = riverRaceData.clan.periodPoints;
         const clanName = riverRaceData.clan.name;
 
         // 2. Création d'une liste contenant uniquement les tags des membres actuels
@@ -42,11 +41,24 @@ async function runDailyTask() {
             currentMemberTags.has(participant.tag),
         );
 
+        // 4.  Récupération des statistiques en fonction de si on est en coliseum ou non
+        let fame = 0;
+        let totalAttacks = 0;
+        if(riverRaceData.periodType == "colosseum") {
+            totalAttacks = activeParticipants.reduce((sum, p) => sum + p.decksUsed, 0);
+            fame = riverRaceData.clan.fame
+        }
+        else {
+             totalAttacks = activeParticipants.reduce((sum, p) => sum + p.decksUsedToday, 0);
+             fame = riverRaceData.clan.periodPoints;
+        }
+
         // // 4. On appel les fonctions discord
         await discordMessage.recapDaily(
             activeParticipants,
-            dailyClanFame,
+            fame,
             clanName,
+            totalAttacks,
             reportChannelId,
             discordToken,
         );

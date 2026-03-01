@@ -5,7 +5,7 @@ class DiscordMessage {
   constructor(client) {
     this.client = client;
   }
-  async recapDaily(players, dailyClanFame, clanName, discordChannelId) {
+  async recapDaily(players, clanFame, clanName, totalAttacks, discordChannelId) {
 
     try {
       // 1. COLLECTE ET TRI DES DONNÉES
@@ -26,15 +26,12 @@ class DiscordMessage {
 
       // 2. CALCUL DES INDICATEURS CLÉS
 
-      // Pour l'efficacité du JOUR, on divise les points du jour par les attaques du JOUR
-      const totalAttacks = players.reduce((sum, p) => sum + p.decksUsedToday, 0);
-
       const remainingAttacks = players.reduce(
         (sum, p) => sum + Math.max(0, 4 - p.decksUsedToday),
         0,
       );
       const famePerAtk =
-        totalAttacks > 0 ? Math.round(dailyClanFame / totalAttacks) : 0;
+        totalAttacks > 0 ? Math.round(clanFame / totalAttacks) : 0;
 
       // Ajustement automatique du texte (singulier/pluriel)
       const attackLabel =
@@ -49,7 +46,7 @@ class DiscordMessage {
           // En-tête avec les statistiques globales du clan
           {
             name: "🏆 Points",
-            value: `**${dailyClanFame.toLocaleString()}** points`,
+            value: `**${clanFame.toLocaleString()}** points`,
             inline: true,
           },
           {
