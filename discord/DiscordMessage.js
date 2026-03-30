@@ -144,19 +144,14 @@ class DiscordMessage {
 
       const embedLow = new EmbedBuilder()
         .setTitle("📉 Weekly Clan War Recap (Avertissements)")
-        .setColor("#e74c3c") // Rouge
-        .setDescription("Joueurs sous la barre des **1800 points**")
-        .addFields({
-          name: "Membres concernés",
-          value: lowFame.length
-            ? lowFame
-              .map(
-                (p) =>
-                  `• **${p.name}**(${p.tag}) — ${p.fame} points | ${p.decksUsed} decks | ${p.role}`,
-              )
-              .join("\n")
-            : "🎉 Personne en dessous de 1800 !",
-        });
+        .setColor("#e74c3c")
+        // On met toute la logique directement dans la description
+        .setDescription(
+          "Joueurs sous la barre des **1800 points**\n\n" +
+          (lowFame.length
+            ? lowFame.map(p => `• **${p.name}** (${p.tag}) — ${p.fame} pts | ${p.decksUsed} decks | ${p.role}`).join("\n")
+            : "🎉 Personne en dessous de 1800 !")
+        );
 
       // --- 2 : Promotions (>= 2800 & role === 'member') ---
       const toPromote = players
@@ -166,20 +161,15 @@ class DiscordMessage {
       const embedHigh = new EmbedBuilder()
         .setTitle("🆙 Promotions Recommandées")
         .setColor("#2ecc71") // Vert
+        // On fusionne le texte d'intro et la liste dynamique dans la description
         .setDescription(
-          "Membres éligibles pour devenir **Elder** (>= 2800 points)",
-        )
-        .addFields({
-          name: "À promouvoir",
-          value: toPromote.length
+          "Membres éligibles pour devenir **Elder** (>= 2800 points)\n\n" +
+          (toPromote.length
             ? toPromote
-              .map(
-                (p) =>
-                  `• **${p.name}**(${p.tag}) — ${p.fame} points | ${p.decksUsed} decks`,
-              )
+              .map((p) => `• **${p.name}**(${p.tag}) — ${p.fame} points | ${p.decksUsed} decks`)
               .join("\n")
-            : "Aucune promotion à faire cette semaine.",
-        })
+            : "Aucune promotion à faire cette semaine.")
+        )
         .setTimestamp();
 
       // --- ENVOI DISCORD ---
@@ -232,5 +222,4 @@ class DiscordMessage {
     }
   }
 }
-
 module.exports = { DiscordMessage };
