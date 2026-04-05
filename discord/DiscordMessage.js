@@ -134,12 +134,12 @@ class DiscordMessage {
     }
   }
 
-  async recapWeekly(players, discordChannelId) {
+  async recapWeekly(players, discordChannelId, demotePoints, promotePoints ) {
 
     try {
-      // --- 1 : Joueurs en danger (< 1800) ---
+      // --- 1 : Joueurs en danger ---
       const lowFame = players
-        .filter((p) => p.fame < 1800)
+        .filter((p) => p.fame < demotePoints)
         .sort((a, b) => b.fame - a.fame); // Tri décroissant
 
       const embedLow = new EmbedBuilder()
@@ -147,15 +147,15 @@ class DiscordMessage {
         .setColor("#e74c3c")
         // On met toute la logique directement dans la description
         .setDescription(
-          "Joueurs sous la barre des **1800 points**\n\n" +
+          `Joueurs sous la barre des **${demotePoints} Points**\n\n` +
           (lowFame.length
             ? lowFame.map(p => `• **${p.name}** (${p.tag}) — ${p.fame} pts | ${p.decksUsed} decks | ${p.role}`).join("\n")
-            : "🎉 Personne en dessous de 1800 !")
+            : `🎉 Personne en dessous de ${demotePoints} !`)
         );
 
-      // --- 2 : Promotions (>= 2800 & role === 'member') ---
+      // --- 2 : Promotions (>= promotePoints & role === 'member') ---
       const toPromote = players
-        .filter((p) => p.fame >= 2800 && p.role === "member") // Uniquement les 'member'
+        .filter((p) => p.fame >= promotePoints && p.role === "member") // Uniquement les 'member'
         .sort((a, b) => b.fame - a.fame); // Tri décroissant (les plus gros scores en haut)
 
       const embedHigh = new EmbedBuilder()
@@ -163,7 +163,7 @@ class DiscordMessage {
         .setColor("#2ecc71") // Vert
         // On fusionne le texte d'intro et la liste dynamique dans la description
         .setDescription(
-          "Membres éligibles pour devenir **Elder** (>= 2800 points)\n\n" +
+          `Membres éligibles pour devenir **Elder** (>= ${promotePoints} points)\n\n` +
           (toPromote.length
             ? toPromote
               .map((p) => `• **${p.name}**(${p.tag}) — ${p.fame} points | ${p.decksUsed} decks`)
