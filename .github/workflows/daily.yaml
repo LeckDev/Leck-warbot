@@ -21,3 +21,5 @@ jobs:
           REPORT_CHANNEL_ID: ${{ secrets.REPORT_CHANNEL_ID }}
           CLASH_API_TOKEN: ${{ secrets.CLASH_API_TOKEN }}
           ABSENTS_CHANNEL_ID: ${{ secrets.ABSENTS_CHANNEL_ID }}
+          DEMOTE_POINTS : ${{ secrets.DEMOTE_POINTS }}
+          PROMOTE_POINTS : ${{ secrets.PROMOTE_POINTS }}
