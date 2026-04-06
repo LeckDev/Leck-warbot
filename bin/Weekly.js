@@ -17,8 +17,8 @@ async function runWeeklyTask() {
     const clanTag = process.env.CLAN_TAG;
     const reportChannelId = process.env.REPORT_CHANNEL_ID;
     const absentsChannelId = process.env.ABSENTS_CHANNEL_ID;
-    const demotePoints = process.env.DEMOTE_POINTS;
-    const promotePoints = process.env.PROMOTE_POINTS;
+    const demotePoints = parseInt(process.env.DEMOTE_POINTS);
+    const promotePoints = parseInt(process.env.PROMOTE_POINTS);
 
     // 1. Récupération des données brutes
     const warLogData = await clashApi.getWarLog(clanTag);
