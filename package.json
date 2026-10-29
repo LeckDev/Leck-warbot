@@ -1,13 +1,23 @@
 {
   "name": "leck-warbot",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Bot Discord qui récapitule les guerres de clan Clash Royale",
+  "main": "bin/Daily.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "daily": "node bin/Daily.js",
+    "weekly": "node bin/Weekly.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "discord",
+    "discord-bot",
+    "clash-royale",
+    "nodejs",
+    "github-actions"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "author": "Thomas Arnaud",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
