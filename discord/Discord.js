@@ -1,6 +1,5 @@
 const { ThreadAutoArchiveDuration } = require("discord.js");
 class Discord {
-
   constructor(client) {
     this.client = client;
   }
@@ -13,7 +12,7 @@ class Discord {
       const fetchedThreads = await forumChannel.threads.fetchActive();
       const latestThread = fetchedThreads.threads.first();
 
-      // 2. Vérification de la date (Sécurité anti-vieux thread)
+      // 2. Récupérer le fil le plus récent (le premier du tableau)
       if (!latestThread) {
         console.log("⚠️ Aucun fil trouvé dans le forum.");
         return { threadId: null, absents: [] };
@@ -53,7 +52,10 @@ class Discord {
       };
     } catch (error) {
       console.error("❌ Erreur lors de la récupération des absents :", error);
-      return [];
+      return {
+        threadId: null,
+        absents: [],
+      };
     }
   }
 
@@ -84,9 +86,10 @@ class Discord {
 
       console.log(`✅ Nouveau fil créé : ${thread.name}`);
       return thread;
-    }
-    catch(error){
-      console.log(`Erreur lors de la récupération des messages des absent : ${error}`)
+    } catch (error) {
+      console.log(
+        `Erreur lors de la récupération des messages des absent : ${error}`,
+      );
     }
   }
 
@@ -98,9 +101,8 @@ class Discord {
         await thread.setArchived(true); // Le fil est masqué/archivé
         console.log(`🔒 Fil ${thread.name} archivé et verrouillé.`);
       }
-    }
-    catch(error) {
-      console.log(`Erreur lors de l'archivage du thread : ${error}`)
+    } catch (error) {
+      console.log(`Erreur lors de l'archivage du thread : ${error}`);
     }
   }
 }
