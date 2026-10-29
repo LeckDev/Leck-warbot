@@ -1,12 +1,16 @@
 const { EmbedBuilder } = require("discord.js");
 
 class DiscordMessage {
-
   constructor(client) {
     this.client = client;
   }
-  async recapDaily(players, clanFame, clanName, totalAttacks, discordChannelId) {
-
+  async recapDaily(
+    players,
+    clanFame,
+    clanName,
+    totalAttacks,
+    discordChannelId,
+  ) {
     try {
       // 1. COLLECTE ET TRI DES DONNÉES
       const lowDecksMap = {};
@@ -128,14 +132,12 @@ class DiscordMessage {
       const channel = await this.client.channels.fetch(discordChannelId);
       await channel.send({ embeds: [embed] });
       console.log("✅ Daily Recap envoyé.");
-    }
-    catch (error) {
-      console.log("Erreur lors du recap daily :", error)
+    } catch (error) {
+      console.log("Erreur lors du recap daily :", error);
     }
   }
 
-  async recapWeekly(players, discordChannelId, demotePoints, promotePoints ) {
-
+  async recapWeekly(players, discordChannelId, demotePoints, promotePoints) {
     try {
       // --- 1 : Joueurs en danger ---
       const lowFame = players
@@ -148,9 +150,14 @@ class DiscordMessage {
         // On met toute la logique directement dans la description
         .setDescription(
           `Joueurs sous la barre des **${demotePoints} Points**\n\n` +
-          (lowFame.length
-            ? lowFame.map(p => `• **${p.name}** (${p.tag}) — ${p.fame} pts | ${p.decksUsed} decks | ${p.role}`).join("\n")
-            : `🎉 Personne en dessous de ${demotePoints} !`)
+            (lowFame.length
+              ? lowFame
+                  .map(
+                    (p) =>
+                      `• **${p.name}** (${p.tag}) — ${p.fame} pts | ${p.decksUsed} decks | ${p.role}`,
+                  )
+                  .join("\n")
+              : `🎉 Personne en dessous de ${demotePoints} !`),
         );
 
       // --- 2 : Promotions (>= promotePoints & role === 'member') ---
@@ -164,11 +171,14 @@ class DiscordMessage {
         // On fusionne le texte d'intro et la liste dynamique dans la description
         .setDescription(
           `Membres éligibles pour devenir **Elder** (>= ${promotePoints} points)\n\n` +
-          (toPromote.length
-            ? toPromote
-              .map((p) => `• **${p.name}**(${p.tag}) — ${p.fame} points | ${p.decksUsed} decks`)
-              .join("\n")
-            : "Aucune promotion à faire cette semaine.")
+            (toPromote.length
+              ? toPromote
+                  .map(
+                    (p) =>
+                      `• **${p.name}**(${p.tag}) — ${p.fame} points | ${p.decksUsed} decks`,
+                  )
+                  .join("\n")
+              : "Aucune promotion à faire cette semaine."),
         )
         .setTimestamp();
 
@@ -182,17 +192,13 @@ class DiscordMessage {
       await channel.send({ embeds: [embedHigh] });
 
       console.log("✅ Les 2 rapports Discord ont été envoyés.");
-    }
-    catch (error) {
-      console.log("Erreur lors du recap weekly :", error)
+    } catch (error) {
+      console.log("Erreur lors du recap weekly :", error);
     }
   }
 
   async recapAbsents(messages, discordChannelId) {
-
     try {
-
-
       const embedAbsents = new EmbedBuilder()
         .setTitle("⚠️ Rappel des membres absents")
         .setColor("#3c64e7")
@@ -201,13 +207,11 @@ class DiscordMessage {
           name: "Membres concernés",
           value: messages.length
             ? messages
-              .map(
-                (m) =>
-                  `• **${m.name}**(${m.tag}) — ${m.reason}`,
-              )
-              .join("\n")
-            : "🎉 Aucune membre noté absent !",
-        }).setTimestamp();
+                .map((m) => `• **${m.name}**(${m.tag}) — ${m.reason}`)
+                .join("\n")
+            : "🎉 Aucun membre noté absent !",
+        })
+        .setTimestamp();
 
       // --- ENVOI DISCORD ---
       const channel = await this.client.channels.fetch(discordChannelId);
@@ -216,8 +220,7 @@ class DiscordMessage {
       await channel.send({ embeds: [embedAbsents] });
 
       console.log("✅ Le rapport des absents a été envoyé");
-    }
-    catch (error) {
+    } catch (error) {
       console.error("Erreur lors du recap des absents:", error);
     }
   }
