@@ -27,7 +27,9 @@ Ce bot récupère les données de l'API Clash Royale et publie automatiquement d
 - Les joueurs ayant quitté le clan sont écartés du rapport
 
 <!-- 📸 CAPTURE 1 : rapport de guerre quotidien
-<!-- ![Rapport de guerre](docs/images/rapport-guerre.png) -->
+     Place l'image dans docs/images/rapport-guerre.png puis décommente la ligne suivante : -->
+
+![Rapport de guerre](docs/images/rapport-guerre.png)
 
 ### Bilan hebdomadaire (`bin/Weekly.js`)
 
@@ -37,7 +39,9 @@ Ce bot récupère les données de l'API Clash Royale et publie automatiquement d
 - Les deux seuils sont **configurables** par variables d'environnement, sans toucher au code
 
 <!-- 📸 CAPTURE 2 : bilan hebdomadaire (Avertissements / Promotions / Membres absents)
-<!-- ![Bilan hebdomadaire](docs/images/recap-hebdo.png) -->
+     Place l'image dans docs/images/recap-hebdo.png puis décommente la ligne suivante : -->
+
+![Bilan hebdomadaire](docs/images/recap-hebdo.png)
 
 ### Gestion automatique des absences
 
@@ -49,7 +53,9 @@ Chaque semaine, le bot :
 4. **crée le fil de la nouvelle semaine** avec le modèle à copier.
 
 <!-- 📸 CAPTURE 3 : fils d'absences hebdomadaires dans le forum Discord
-<!-- ![Fils d'absences](docs/images/absences.png) -->
+     Place l'image dans docs/images/absences.png puis décommente la ligne suivante : -->
+
+![Fils d'absences](docs/images/absences.png)
 
 ---
 
