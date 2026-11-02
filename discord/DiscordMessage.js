@@ -145,7 +145,9 @@ class DiscordMessage {
         .sort((a, b) => b.fame - a.fame); // Tri décroissant
 
       const embedLow = new EmbedBuilder()
-        .setTitle("📉 RAPPORT DE GUERRE HEBDOMADAIRE (Avertissements)")
+        .setAuthor({
+          name: "📉 RAPPORT DE GUERRE HEBDOMADAIRE (Avertissements)",
+        })
         .setColor("#e74c3c")
         // On met toute la logique directement dans la description
         .setDescription(
@@ -166,7 +168,9 @@ class DiscordMessage {
         .sort((a, b) => b.fame - a.fame); // Tri décroissant (les plus gros scores en haut)
 
       const embedHigh = new EmbedBuilder()
-        .setTitle("🆙 PROMOTIONS RECOMMANDÉES ")
+        .setAuthor({
+          name: "🆙 PROMOTIONS RECOMMANDÉES ",
+        })
         .setColor("#2ecc71") // Vert
         // On fusionne le texte d'intro et la liste dynamique dans la description
         .setDescription(
@@ -200,7 +204,9 @@ class DiscordMessage {
   async recapAbsents(messages, discordChannelId) {
     try {
       const embedAbsents = new EmbedBuilder()
-        .setTitle("⚠️ RAPPEL DES MEMBRES ABSENTS")
+        .setAuthor({
+          name: "⚠️ RAPPEL DES MEMBRES ABSENTS",
+        })
         .setColor("#3c64e7")
         // .setDescription("Joueurs")
         .addFields({
